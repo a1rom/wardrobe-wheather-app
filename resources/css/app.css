@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    [x-cloak] { display: none !important; }
+    
+    .flashlight {
+        @apply border border-fuchsia-600;
+    }
+}
