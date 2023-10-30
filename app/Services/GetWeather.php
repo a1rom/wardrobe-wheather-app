@@ -29,10 +29,10 @@ class GetWeather
         
         if($response->getStatusCode() == 200) {
             $content = $response->getBody()->getContents();
-            $data = json_decode($content);
-            
-            if(isset($data['sucess']) && $data['success'] === false) {
-                Log::warning('Weatherstack API error: ' . $data);
+            $data = json_decode($content, true);
+
+            if($data['success'] === false) {
+                Log::warning('Weatherstack API error: ' . json_encode($data));
                 return false;
             }
 
