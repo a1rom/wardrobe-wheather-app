@@ -19,6 +19,10 @@
         </button>
     </div>
 
+    <div>
+
+    </div>
+
     {{-- 💁 Info --}}
     <div class="mx-6 mt-12">
         <h3 class="text-base font-semibold leading-6 text-gray-900">Location Name</h3>

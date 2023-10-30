@@ -2,6 +2,6 @@
 @section('content')
     <x-header />
 
-    <livewire:weather />
+    <livewire:weather-show />
 
 @endsection
