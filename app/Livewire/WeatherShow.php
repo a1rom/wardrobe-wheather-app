@@ -11,6 +11,11 @@ class WeatherShow extends Component
     public string $locationSearch = '';
 
     public string $location = '';
+
+    /**
+     * @var array<string, mixed>
+     */
+    public array $weather;
     
     public function render() : \Illuminate\View\View
     {
@@ -30,8 +35,13 @@ class WeatherShow extends Component
 
         $weatherDto = (New WeatherDto())->fromJson($weather);
 
-        $this->location = $weatherDto->location_name;
-
+        if($weatherDto === false) {
+            $this->addError('technicalIssue', 'Technical issue, please try again later');
+            return;
+        }
+        
+        $this->weather = $weatherDto->toArray();
+        
         // $this->emit('weatherFetched', $weatherDto);
     }
 }

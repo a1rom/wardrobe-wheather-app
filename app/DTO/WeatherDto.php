@@ -4,15 +4,6 @@ namespace App\DTO;
 
 use InvalidArgumentException;
 
-/**
- * @property string $location_name
- * @property string $location_country
- * @property string $location_time
- * @property int $current_temperature
- * @property array $current_weather_icons
- * @property array $current_weather_descriptions
- * @property int $current_wind_speed
- */
 
 class WeatherDto
 {
@@ -20,37 +11,42 @@ class WeatherDto
     * @var array<string, array<string, mixed>> $fields
      */
     private array $fields = [
-        'location_name' => [
+        'location.name' => [
             'type' => 'string',
             'default' => '',
             'required' => true,
         ],
-        'location_country' => [
+        'location.country' => [
             'type' => 'string',
             'default' => '',
             'required' => true,
         ],
-        'location_time' => [
+        'location.localtime' => [
             'type' => 'string',
             'default' => '',
             'required' => true,
         ],
-        'current_temperature' => [
+        'location.localtime_epoch' => [
+            'type' => 'integer',
+            'default' => '',
+            'required' => true,
+        ],
+        'current.temperature' => [
             'type' => 'integer',
             'default' => 0,
             'required' => true,
         ],
-        'current_weather_icons' => [
+        'current.weather_icons' => [
             'type' => 'array',
             'default' => [],
             'required' => true,
         ],
-        'current_weather_descriptions' => [
+        'current.weather_descriptions' => [
             'type' => 'array',
             'default' => [],
             'required' => true,
         ],
-        'current_wind_speed' => [
+        'current.wind_speed' => [
             'type' => 'integer',
             'default' => 0,
             'required' => true,
@@ -60,7 +56,7 @@ class WeatherDto
     private bool $softmode = true;
 
     /**
-     * @var array<string, string|integer|bool>
+     * @var array<string, mixed>
      */
     private array $data = [];
     
@@ -69,7 +65,7 @@ class WeatherDto
         //
     }
 
-    public function fromJson(string $json) : self
+    public function fromJson(string $json) : self|false
     {
         try {
             $array = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
@@ -85,9 +81,18 @@ class WeatherDto
      * @return WeatherDto
      * @throws InvalidArgumentException
      */
-    public function fromArray(array $array) : self
+    public function fromArray(array $array) : self|false
     {
-        $this->validate($array);
+        try {
+            $this->validate($array);
+        } catch (\InvalidArgumentException $e) {
+            if(env('APP_DEBUG') === true) {
+                throw new \InvalidArgumentException ($e->getMessage());
+            } else {
+                return false;
+            }
+        }
+
         return $this;
     }
     
@@ -97,7 +102,8 @@ class WeatherDto
     private function validate(array $array): void
     {
         foreach ($this->fields as $field => $info) {
-            $fieldParts = explode('_', $field);
+            $fieldParts = explode('.', $field);
+
             $value = $array;
     
             foreach ($fieldParts as $part) {
@@ -105,6 +111,7 @@ class WeatherDto
                     $value = $value[$part];
                 } else {
                     $value = null;
+            
                     break;
                 }
             }
@@ -125,6 +132,8 @@ class WeatherDto
                 $this->data[$field] = $value;
             }
         }
+
+        $this->data = $this->arrayDotToNested($this->data);
     }
 
     public function __get(string $name) : mixed
@@ -135,5 +144,84 @@ class WeatherDto
             return null;
             // throw new \InvalidArgumentException("Field $name does not exist.");
         }
+    }
+
+    public function get(string $name) : mixed
+    {
+        $keys = explode('.', $name);
+
+        $data = $this->data;
+
+        foreach ($keys as $key) {
+            if (is_array($data) && array_key_exists($key, $data)) {
+                $data = $data[$key];
+            } else {
+                return null;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * function: toArray
+     * 
+     * @return array<string, mixed>
+     */
+    public function toArray() : array
+    {
+        return $this->data;
+    }
+
+    /**
+     * 
+     * 
+     * function: arrayDotToNested
+     * 
+     * @param array<mixed> $array
+     * 
+     * @return array<mixed>
+     */
+    private function arrayDotToNested(array $array) : array
+    {
+        $result = [];
+        
+        foreach ($array as $key => $value) {
+            $this->arraySet($result, $key, $value);
+        }
+
+        return $result;
+    }
+    
+    /**
+     * function: arraySet
+     * 
+     * @param array<mixed> $array
+     * @param mixed $key
+     * @param mixed $value
+     * 
+     * @return array<string, mixed>
+     */
+    private function arraySet(&$array, $key, $value) : array
+    {
+        if (is_null($key)) {
+            return $array = $value;
+        }
+    
+        $keys = explode('.', $key);
+    
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+    
+            if (!isset($array[$key]) || !is_array($array[$key])) {
+                $array[$key] = [];
+            }
+    
+            $array = &$array[$key];
+        }
+    
+        $array[array_shift($keys)] = $value;
+    
+        return $array;
     }
 }
