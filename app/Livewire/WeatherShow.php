@@ -5,12 +5,25 @@ namespace App\Livewire;
 use App\DTO\WeatherDto;
 use Livewire\Component;
 use App\Services\GetWeather;
+use App\Actions\WardrobeSuggestionsGet;
 
 class WeatherShow extends Component
 {
     public string $locationSearch = '';
 
+    public string $units = 'm';
+
     public string $location = '';
+
+    /**
+     * @var array<string, mixed>
+     */
+    public array $weather;
+
+    /**
+     * @var array<string, mixed>
+     */
+    public array $wardrobeSuggestions;
     
     public function render() : \Illuminate\View\View
     {
@@ -19,7 +32,8 @@ class WeatherShow extends Component
 
     public function search() : void
     {
-        $weather = (new GetWeather($this->locationSearch))->run();
+        $weather = (new GetWeather($this->locationSearch, $this->units))
+            ->run();
 
         if($weather === false) {
             $this->addError('locationSearch', 'Location not found');
@@ -30,8 +44,15 @@ class WeatherShow extends Component
 
         $weatherDto = (New WeatherDto())->fromJson($weather);
 
-        $this->location = $weatherDto->location_name;
+        if($weatherDto === false) {
+            $this->addError('technicalIssue', 'Technical issue, please try again later');
+            return;
+        }
 
-        // $this->emit('weatherFetched', $weatherDto);
+        $this->wardrobeSuggestions = (new WardrobeSuggestionsGet())->run($weatherDto);
+
+        $this->weather = $weatherDto->toArray();
+        
+        $this->dispatch('weatherFetched');
     }
 }

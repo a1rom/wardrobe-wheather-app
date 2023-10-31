@@ -1,4 +1,7 @@
-<div>
+<div x-data="{ weatherShow: false}"
+    x-init="Livewire.on('weatherFetched', data => {
+        weatherShow = true;
+    })">
     {{-- 🔎 Search --}}
     <div class="px-2 sm:px-0 flex justify-center relative">
         <div class="relative w-full sm:w-3/4 md:w-3/4 lg:w-1/2">
@@ -30,25 +33,98 @@
         </button>
     </div>
 
+    @if($errors->has('technicalIssue'))
+        <p class="mt-2 px-2 text-base text-red-600">
+            {{ $errors->first('technicalIssue') }}  
+        </p>
+    @endif
+
     {{-- 💁 Info --}}
-    <div class="mx-6 mt-12">
-        <h3 class="text-base font-semibold leading-6 text-gray-900">
-            {{ $location }}
-        </h3>
-        <div class="mt-5 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow md:grid-cols-3 md:divide-x md:divide-y-0">
-        
-          <x-weather.card 
-            date="2023-11-16"
-            temperature="27 C"
-            description="Windy" />
-          <x-weather.card 
-            date="2023-11-16"
-            temperature="27 C"
-            description="Windy" />
-          <x-weather.card 
-            date="2023-11-16"
-            temperature="27 C"
-            description="Windy" />
+    <div x-show="weatherShow" x-cloak 
+        class="py-8 px-2 sm:px-8 md:px-16 lg:px-32">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6">
+            <div class="flex items-center justify-center">
+                <div class="items-center flex flex-col md:flex-row md:justify-center">
+                    <div class="w-64 h-64 bg-white rounded-lg border shadow flex flex-col gap-y-2 justify-center items-center text-center p-6">
+                        <div class="text-md font-bold flex flex-col text-gray-900">
+                            <span class="uppercase">
+                                {{ data_get($weather, 'location.name') }}
+                            </span>
+                            
+                            <span class="font-normal text-gray-700 text-sm">
+                                {{ data_get($weather, 'location.localtime') }}
+                            </span>
+                        </div>
+                        
+                        <div class="w-32 h-16 flex items-center justify-center">
+                            <img src="{{ data_get($weather, 'current.weather_icons.0') }}"/>
+                        </div>
+                        
+                        <p class="text-gray-700">
+                            {{ data_get($weather, 'current.weather_descriptions.0') }}
+                        </p>
+            
+                        <div class="text-3xl font-bold text-gray-900">
+                            {{ data_get($weather, 'current.temperature') }}
+                            {{ config(sprintf('weather.%s.temperature', $units)) }}
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="flex flex-col gap-1 text-sm text-gray-900">
+                                <div>
+                                    Wind
+                                </div>
+                                <div>
+                                    {{ data_get($weather, 'current.wind_speed') }} 
+                                    {{ config(sprintf('weather.%s.speed', $units)) }}
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-1 text-sm text-gray-900">
+                                <div>
+                                    Direction
+                                </div>
+                                <div>
+                                    {{ data_get($weather, 'current.wind_dir') }}
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-1 text-sm text-gray-900">
+                                <div>
+                                    Humidity
+                                </div>
+                                <div>
+                                    {{ data_get($weather, 'current.humidity') }} %
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center">
+                <div class="items-center flex flex-col md:flex-row md:justify-center">
+                    <div class="w-64 h-64 bg-white rounded-lg border shadow flex flex-col gap-y-2 justify-center items-center text-center p-6">
+                        <div class="text-md font-bold flex flex-col text-gray-900">
+                            <span class="uppercase">
+                                Best choise
+                            </span>
+                        </div>
+
+                        @foreach ($wardrobeSuggestions as $key => $suggestions)
+                        <p class="text-gray-700">
+                            {{ ucfirst($key) }}: 
+                            @foreach($wardrobeSuggestions[$key] as $item)
+                                @if($loop->last && !$loop->first)
+                                    or
+                                @endif
+                                {{ $item }} 
+                                @if(!$loop->last)
+                                    ,
+                                @endif
+                            @endforeach
+                        @endforeach
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
