@@ -51,6 +51,16 @@ class WeatherDto
             'default' => 0,
             'required' => true,
         ],
+        'current.wind_dir' => [
+            'type' => 'string',
+            'default' => '',
+            'required' => true,
+        ],
+        'current.humidity' => [
+            'type' => 'integer',
+            'default' => 0,
+            'required' => true,
+        ],
     ];
 
     private bool $softmode = true;
