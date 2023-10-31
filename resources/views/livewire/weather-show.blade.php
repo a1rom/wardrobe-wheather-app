@@ -105,7 +105,7 @@
                     <div class="w-64 h-64 bg-white rounded-lg border shadow flex flex-col gap-y-2 justify-center items-center text-center p-6">
                         <div class="text-md font-bold flex flex-col text-gray-900">
                             <span class="uppercase">
-                                Best choise
+                                Best choice
                             </span>
                         </div>
 
