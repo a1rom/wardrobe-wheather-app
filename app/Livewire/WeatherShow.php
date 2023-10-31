@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\DTO\WeatherDto;
 use Livewire\Component;
 use App\Services\GetWeather;
+use App\Actions\WardrobeSuggestionsGet;
 
 class WeatherShow extends Component
 {
@@ -18,6 +19,11 @@ class WeatherShow extends Component
      * @var array<string, mixed>
      */
     public array $weather;
+
+    /**
+     * @var array<string, mixed>
+     */
+    public array $wardrobeSuggestions;
     
     public function render() : \Illuminate\View\View
     {
@@ -42,6 +48,8 @@ class WeatherShow extends Component
             $this->addError('technicalIssue', 'Technical issue, please try again later');
             return;
         }
+
+        $this->wardrobeSuggestions = (new WardrobeSuggestionsGet())->run($weatherDto);
 
         $this->weather = $weatherDto->toArray();
         

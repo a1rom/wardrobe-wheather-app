@@ -109,9 +109,19 @@
                             </span>
                         </div>
 
+                        @foreach ($wardrobeSuggestions as $key => $suggestions)
                         <p class="text-gray-700">
-                            Coat and Hat
-                        </p>
+                            {{ ucfirst($key) }}: 
+                            @foreach($wardrobeSuggestions[$key] as $item)
+                                @if($loop->last && !$loop->first)
+                                    or
+                                @endif
+                                {{ $item }} 
+                                @if(!$loop->last)
+                                    ,
+                                @endif
+                            @endforeach
+                        @endforeach
                     </div>
                 </div>
             </div>
