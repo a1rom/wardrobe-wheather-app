@@ -13,8 +13,6 @@ class WeatherShow extends Component
 
     public string $units = 'm';
 
-    public string $location = '';
-
     /**
      * @var array<string, mixed>
      */
@@ -32,24 +30,25 @@ class WeatherShow extends Component
 
     public function search() : void
     {
-        $weather = (new GetWeather($this->locationSearch, $this->units))
-            ->run();
+        $weather = GetWeather::getInstance(config('weatherstack.api_key'));
+        
+        $weatherResult = $weather->run($this->locationSearch, $this->units);
 
-        if($weather === false) {
+        if($weatherResult === false) {
             $this->addError('locationSearch', 'Location not found');
             return;
         }
 
         $this->resetValidation();
 
-        $weatherDto = (New WeatherDto())->fromJson($weather);
+        $weatherDto = (New WeatherDto())->fromJson($weatherResult);
 
         if($weatherDto === false) {
             $this->addError('technicalIssue', 'Technical issue, please try again later');
             return;
         }
 
-        $this->wardrobeSuggestions = (new WardrobeSuggestionsGet())->run($weatherDto);
+        $this->wardrobeSuggestions = (new WardrobeSuggestionsGet($weatherDto))->run();
 
         $this->weather = $weatherDto->toArray();
         
