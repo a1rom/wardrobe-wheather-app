@@ -10,6 +10,8 @@ class WeatherShow extends Component
 {
     public string $locationSearch = '';
 
+    public string $units = 'm';
+
     public string $location = '';
 
     /**
@@ -24,7 +26,8 @@ class WeatherShow extends Component
 
     public function search() : void
     {
-        $weather = (new GetWeather($this->locationSearch))->run();
+        $weather = (new GetWeather($this->locationSearch, $this->units))
+            ->run();
 
         if($weather === false) {
             $this->addError('locationSearch', 'Location not found');
@@ -39,9 +42,9 @@ class WeatherShow extends Component
             $this->addError('technicalIssue', 'Technical issue, please try again later');
             return;
         }
-        
+
         $this->weather = $weatherDto->toArray();
         
-        // $this->emit('weatherFetched', $weatherDto);
+        $this->dispatch('weatherFetched');
     }
 }
