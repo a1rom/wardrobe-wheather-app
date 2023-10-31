@@ -8,6 +8,10 @@ use App\Services\GetWeather;
 
 class WeatherShow extends Component
 {
+    public string $locationSearch = '';
+
+    public string $location = '';
+    
     public function render() : \Illuminate\View\View
     {
         return view('livewire.weather-show');
@@ -15,20 +19,19 @@ class WeatherShow extends Component
 
     public function search() : void
     {
-        $weather = (new GetWeather($this->location))->run();
+        $weather = (new GetWeather($this->locationSearch))->run();
 
         if($weather === false) {
-            // $this->addError('location', 'Location not found');
+            $this->addError('locationSearch', 'Location not found');
             return;
         }
 
+        $this->resetValidation();
+
         $weatherDto = (New WeatherDto())->fromJson($weather);
 
-xdebug_break();
-        $location = $weatherDto->location_name;
+        $this->location = $weatherDto->location_name;
 
-xdebug_break();
         // $this->emit('weatherFetched', $weatherDto);
-
     }
 }
