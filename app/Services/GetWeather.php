@@ -7,25 +7,34 @@ use Illuminate\Support\Facades\Log;
 
 class GetWeather
 {
-    private string $location;
-    private string $units;
+    private static ?GetWeather $instance = null;
+
     private string $apiKey;
+
+    private Client $client;
     
-    public function __construct(string $location, string $units = 'm')
+    public function __construct(string $apiKey)
     {
-        $this->location = $location;
-        $this->units = $units;
-        $this->apiKey = env('WEATHERSTACK_API_KEY');
+        $this->apiKey = $apiKey;
+        $this->client = new Client();
     }
 
-    public function run() : string|false
+    public static function getInstance(string $apiKey): GetWeather
     {
-        $client = new Client();
-        $response = $client->get('http://api.weatherstack.com/current', [
+        if (self::$instance === null) {
+            self::$instance = new self($apiKey);
+        }
+
+        return self::$instance;
+    }
+
+    public function run(string $location, string $units) : string|false
+    {
+        $response = $this->client->get('http://api.weatherstack.com/current', [
             'query' => [
                 'access_key' => $this->apiKey,
-                'query' => $this->location,
-                'units' => $this->units,
+                'query' => $location,
+                'units' => $units,
             ],
         ]);
         
@@ -42,5 +51,10 @@ class GetWeather
         }
 
         return false;
+    }
+
+    public function setClient(Client $client): void
+    {
+        $this->client = $client;
     }
 }
