@@ -65,7 +65,8 @@
                         </p>
             
                         <div class="text-3xl font-bold text-gray-900">
-                            {{ data_get($weather, 'current.temperature') }} º
+                            {{ data_get($weather, 'current.temperature') }}
+                            {{ config(sprintf('weather.%s.temperature', $units)) }}
                         </div>
 
                         <div class="grid grid-cols-3 gap-3">
@@ -74,7 +75,8 @@
                                     Wind
                                 </div>
                                 <div>
-                                    {{ data_get($weather, 'current.wind_speed') }} m/s
+                                    {{ data_get($weather, 'current.wind_speed') }} 
+                                    {{ config(sprintf('weather.%s.speed', $units)) }}
                                 </div>
                             </div>
                             <div class="flex flex-col gap-1 text-sm text-gray-900">
@@ -106,7 +108,7 @@
                                 Best choise
                             </span>
                         </div>
-                                                
+
                         <p class="text-gray-700">
                             Coat and Hat
                         </p>
