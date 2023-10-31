@@ -6,6 +6,8 @@ use App\DTO\WeatherDto;
 
 class WardrobeSuggestionsGet
 {
+    private WeatherDto $weatherDto;
+    
     /**
      * @var array<string, array<string, array<string, array<mixed>>>>
      */
@@ -63,23 +65,27 @@ class WardrobeSuggestionsGet
         ],
     ];
     
-    public function __construct()
+    /**
+     * @param WeatherDto $weatherDto
+     * 
+     * @return void
+     */
+    public function __construct(WeatherDto $weatherDto)
     {
-    
+        $this->weatherDto = $weatherDto;
     }
 
     /**
-     * @param WeatherDto $weatherDto
      * @return array<string, array<string>>
      */
-    public function run(WeatherDto $weatherDto) : array
+    public function run() : array
     {
         $suggestions = [];
 
         foreach($this->clothes as $clothesType => $clothes) {
             foreach($clothes as $clothesName => $clothesData) {
-                if($weatherDto->get('current.temperature') >= $clothesData['temperature']['min'] && $weatherDto->get('current.temperature') <= $clothesData['temperature']['max']) {
-                    if($weatherDto->get('current.wind_speed') >= $clothesData['wind']['min'] && $weatherDto->get('current.wind_speed') <= $clothesData['wind']['max']) {
+                if($this->weatherDto->get('current.temperature') >= $clothesData['temperature']['min'] && $this->weatherDto->get('current.temperature') <= $clothesData['temperature']['max']) {
+                    if($this->weatherDto->get('current.wind_speed') >= $clothesData['wind']['min'] && $this->weatherDto->get('current.wind_speed') <= $clothesData['wind']['max']) {
                         $suggestions[$clothesType][] = $clothesName;
                     }
                 }
