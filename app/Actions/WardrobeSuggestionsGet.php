@@ -6,6 +6,9 @@ use App\DTO\WeatherDto;
 
 class WardrobeSuggestionsGet
 {
+    /**
+     * @var array<string, array<string, array<string, array<mixed>>>>
+     */
     private array $clothes = [
         'head' => [
             'warm hat' => [
@@ -65,6 +68,10 @@ class WardrobeSuggestionsGet
     
     }
 
+    /**
+     * @param WeatherDto $weatherDto
+     * @return array<string, array<string>>
+     */
     public function run(WeatherDto $weatherDto) : array
     {
         $suggestions = [];
