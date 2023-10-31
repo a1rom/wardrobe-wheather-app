@@ -4,7 +4,6 @@ namespace App\DTO;
 
 use InvalidArgumentException;
 
-
 class WeatherDto
 {
     /**
