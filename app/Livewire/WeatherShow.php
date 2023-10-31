@@ -48,7 +48,7 @@ class WeatherShow extends Component
             return;
         }
 
-        $this->wardrobeSuggestions = (new WardrobeSuggestionsGet($weatherDto))->run();
+        $this->wardrobeSuggestions = (new WardrobeSuggestionsGet())->run($weatherDto);
 
         $this->weather = $weatherDto->toArray();
         
