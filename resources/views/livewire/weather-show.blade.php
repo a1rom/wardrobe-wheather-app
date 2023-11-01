@@ -1,7 +1,17 @@
 <div x-data="{ weatherShow: false, recentSearchesShow: false }"
     x-init="Livewire.on('weatherFetched', data => {
         weatherShow = true;
-    })">
+        recentSearchesShow = false;
+    });
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                @this.dispatch('geolocationSuccess', [position.coords.latitude, position.coords.longitude]);
+            }
+        );
+    } 
+    ">
     
     {{-- 🔎 Search --}}
     <div class="px-2 sm:px-0 flex justify-center relative">
@@ -13,7 +23,7 @@
                 name="location_search" 
                 id="location_search"
                 @class([
-                    'w-full rounded-md py-1.5 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 placeholder:text-gray-400 relative', 
+                    'w-full rounded-md py-1.5 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 placeholder:text-gray-400 select-all relative', 
                     'border-0 ring-gray-300 focus:ring-teal-600 text-gray-900' => !$errors->has('locationSearch'),
                     'border border-red-400 ring-red-300 focus:ring-red-300 text-red-600' => $errors->has('locationSearch'),
                 ])
@@ -25,11 +35,11 @@
             @if(session('recent_searches') && count(session('recent_searches')) > 0)
                 <div x-show="recentSearchesShow" x-cloak
                     class="absolute top-10 rounded-md shadow-sm border bg-sky-50 z-10">
-                    <div class="text-xs px-2 pt-1 border-b-gray-900">Recently searched</div>
+                    <div class="text-xs px-2 py-1 bg-sky-100 border-b-gray-900">Recently searched</div>
                     <ul>
                         @foreach (session('recent_searches', []) as $recentLocation)
                             <li wire:click="selectRecentSearch('{{ $recentLocation }}')"
-                                class="hover:bg-sky-200 cursor-default py-2 pl-2 text-gray-900">
+                                class="hover:bg-sky-200 cursor-default py-2 px-2 text-gray-900">
                                 {{ $recentLocation }}
                             </li>
                         @endforeach
@@ -67,8 +77,9 @@
                 <div class="items-center flex flex-col md:flex-row md:justify-center">
                     <div class="w-64 h-64 bg-white rounded-lg border shadow flex flex-col gap-y-2 justify-center items-center text-center p-6">
                         <div class="text-md font-bold flex flex-col text-gray-900">
-                            <span class="uppercase">
-                                {{ data_get($weather, 'location.name') }}
+                            <span class="w-60 uppercase truncate overflow-hidden whitespace-nowrap">
+                                {{ data_get($weather, 'location.name') }},
+                                {{ data_get($weather, 'location.country') }}
                             </span>
                             
                             <span class="font-normal text-gray-700 text-sm">
