@@ -7,5 +7,5 @@
 * run `touch .env`
 * copy .env.example to .env
 * run `php artisan key:generate`
-* update WEATHERSTACK\_API\_KEY
+* update WEATHERSTACK\_API\_KEY , [Weatherstack Documentation](https://weatherstack.com/documentation)
 * run `npm run dev` or `npm run build`
