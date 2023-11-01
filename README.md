@@ -1,5 +1,11 @@
 ## Wardrobe Weather
 
-### Install
+### Start the project
 
-run `composer i`
+* run `composer i`
+* run `npm i`
+* run `touch .env`
+* copy .env.example to .env
+* run `php artisan key:generate`
+* update WEATHERSTACK\_API\_KEY
+* run `npm run dev` or `npm run build`
