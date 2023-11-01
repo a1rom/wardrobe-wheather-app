@@ -4,7 +4,7 @@
     })">
     {{-- 🔎 Search --}}
     <div class="px-2 sm:px-0 flex justify-center relative">
-        <div class="relative w-full sm:w-3/4 md:w-3/4 lg:w-1/2">
+        <div class="w-full sm:w-3/4 md:w-3/4 lg:w-1/2">
             <input 
                 type="text" 
                 name="location_search" 
@@ -16,6 +16,7 @@
                 ])
                 placeholder="Enter your location"
                 wire:model.defer="locationSearch"
+                
             >
             @if($errors->has('locationSearch'))
                 <p class="absolute left-0 mt-2 px-2 text-sm text-red-600">
@@ -28,10 +29,20 @@
             type="button" 
             class="ml-2 inline-flex justify-center py-2 px-4 border-0 border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600"
             wire:click="search"
+            wire:loading.class="cursor-not-allowed opacity-50"
+            wire:loading.attr="disabled"
         > 
             Search 
         </button>
+
+        <div 
+            wire:loading wire:target="search" 
+            class="absolute -bottom-48">
+
+            <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-sky-600 self-center"></div>
+        </div>
     </div>
+
 
     @if($errors->has('technicalIssue'))
         <p class="mt-2 px-2 text-base text-red-600">
@@ -41,6 +52,7 @@
 
     {{-- 💁 Info --}}
     <div x-show="weatherShow" x-cloak 
+        wire:loading.remove wire:target="search" 
         class="py-8 px-2 sm:px-8 md:px-16 lg:px-32">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6">
             <div class="flex items-center justify-center">
