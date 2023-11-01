@@ -63,7 +63,7 @@ class WeatherShow extends Component
         $this->search();
     }
 
-    protected function storeRecentSearch($location)
+    protected function storeRecentSearch(string $location) : void
     {
         $recentSearches = session('recent_searches', []);
 
