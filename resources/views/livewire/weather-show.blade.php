@@ -1,28 +1,47 @@
-<div x-data="{ weatherShow: false}"
+<div x-data="{ weatherShow: false, recentSearchesShow: false }"
     x-init="Livewire.on('weatherFetched', data => {
         weatherShow = true;
     })">
+    
     {{-- 🔎 Search --}}
     <div class="px-2 sm:px-0 flex justify-center relative">
         <div class="w-full sm:w-3/4 md:w-3/4 lg:w-1/2">
             <input 
+                x-on:click.away="recentSearchesShow = false"
+                x-on:click="recentSearchesShow = true"
                 type="text" 
                 name="location_search" 
                 id="location_search"
                 @class([
-                    'w-full rounded-md py-1.5 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 placeholder:text-gray-400', 
+                    'w-full rounded-md py-1.5 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 placeholder:text-gray-400 relative', 
                     'border-0 ring-gray-300 focus:ring-teal-600 text-gray-900' => !$errors->has('locationSearch'),
                     'border border-red-400 ring-red-300 focus:ring-red-300 text-red-600' => $errors->has('locationSearch'),
                 ])
                 placeholder="Enter your location"
-                wire:model.defer="locationSearch"
-                
+                wire:model.defer="locationSearch"  
+                wire:keydown.enter="search" 
             >
-            @if($errors->has('locationSearch'))
-                <p class="absolute left-0 mt-2 px-2 text-sm text-red-600">
-                    {{ $errors->first('locationSearch') }}  
-                </p>
+
+            @if(session('recent_searches') && count(session('recent_searches')) > 0)
+                <div x-show="recentSearchesShow" x-cloak
+                    class="absolute top-10 rounded-md shadow-sm border bg-sky-50 z-10">
+                    <div class="text-xs px-2 pt-1 border-b-gray-900">Recently searched</div>
+                    <ul>
+                        @foreach (session('recent_searches', []) as $recentLocation)
+                            <li wire:click="selectRecentSearch('{{ $recentLocation }}')"
+                                class="hover:bg-sky-200 cursor-default py-2 pl-2 text-gray-900">
+                                {{ $recentLocation }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
+
+            @foreach ($errors->all() as $error)
+                <p class="absolute mt-2 px-2 text-sm text-red-600">
+                    {{ $error }}
+                </p>
+            @endforeach
         </div>
         
         <button 
@@ -35,24 +54,13 @@
             Search 
         </button>
 
-        <div 
-            wire:loading wire:target="search" 
-            class="absolute -bottom-48">
-
+        <div wire:loading class="absolute -bottom-48">
             <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-sky-600 self-center"></div>
         </div>
     </div>
 
-
-    @if($errors->has('technicalIssue'))
-        <p class="mt-2 px-2 text-base text-red-600">
-            {{ $errors->first('technicalIssue') }}  
-        </p>
-    @endif
-
     {{-- 💁 Info --}}
     <div x-show="weatherShow" x-cloak 
-        wire:loading.remove wire:target="search" 
         class="py-8 px-2 sm:px-8 md:px-16 lg:px-32">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6">
             <div class="flex items-center justify-center">

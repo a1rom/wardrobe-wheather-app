@@ -51,7 +51,30 @@ class WeatherShow extends Component
         $this->wardrobeSuggestions = (new WardrobeSuggestionsGet($weatherDto))->run();
 
         $this->weather = $weatherDto->toArray();
+
+        $this->storeRecentSearch($weatherDto->get('location.name'));
         
         $this->dispatch('weatherFetched');
+    }
+
+    public function selectRecentSearch(string $location) : void
+    {
+        $this->locationSearch = $location;
+        $this->search();
+    }
+
+    protected function storeRecentSearch(string $location) : void
+    {
+        $recentSearches = session('recent_searches', []);
+
+        $recentSearches = array_filter($recentSearches, function ($recent) use ($location) {
+            return $recent !== $location;
+        });
+
+        array_unshift($recentSearches, $location);
+
+        $recentSearches = array_slice($recentSearches, 0, 5);
+
+        session(['recent_searches' => $recentSearches]);
     }
 }
