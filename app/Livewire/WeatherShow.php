@@ -22,6 +22,13 @@ class WeatherShow extends Component
      * @var array<string, mixed>
      */
     public array $wardrobeSuggestions;
+
+    /**
+     * @var array<string, string>
+     */
+    protected $listeners = [
+        'geolocationSuccess' => 'geolocationSuccess',
+    ];
     
     public function render() : \Illuminate\View\View
     {
@@ -52,14 +59,22 @@ class WeatherShow extends Component
 
         $this->weather = $weatherDto->toArray();
 
-        $this->storeRecentSearch($weatherDto->get('location.name'));
-        
+        $this->locationSearch = $weatherDto->getLocationNameCountry();
+
+        $this->storeRecentSearch($weatherDto->getLocationNameCountry());
+       
         $this->dispatch('weatherFetched');
     }
 
     public function selectRecentSearch(string $location) : void
     {
         $this->locationSearch = $location;
+        $this->search();
+    }
+
+    public function geolocationSuccess(int $latitude, int $longitude) : void
+    {
+        $this->locationSearch = sprintf('%s,%s', $latitude, $longitude);
         $this->search();
     }
 

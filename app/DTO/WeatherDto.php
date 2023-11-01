@@ -172,6 +172,11 @@ class WeatherDto
         return $data;
     }
 
+    public function getLocationNameCountry() : string
+    {
+        return sprintf('%s, %s', $this->get('location.name'), $this->get('location.country'));
+    }
+
     /**
      * function: toArray
      * 
